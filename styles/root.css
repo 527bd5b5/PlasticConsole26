@@ -1,0 +1,93 @@
+:root {
+    --body-color-1: #dcd8d8;
+    --body-color-2: #acaca8;
+    --body-color-3: #605858;
+    --body-text-color: #444;
+    --shadow-color: rgba(0, 0, 0, 0.25);
+    --logo-color: #eee;
+    --volume-control-color-1: #ccc;
+    --volume-control-color-2: #579;
+    --volume-control-color-3: #345;
+    --primary-button-color: #666;
+    --primary-button-print-color: #eee8;
+    --primary-button-shadow-color: rgba(0, 0, 0, 0.1);
+    --secondary-button-color: #abc;
+    --secondary-button-print-color: #444;
+    --secondary-button-shadow-color: rgba(255, 255, 255, 0.5);
+    --d-pad-color: #666;
+    --d-pad-print-color: #eee8;
+    --d-pad-shadow-color: rgba(0, 0, 0, 0.1);
+    --action-button-color-1: #357;
+    --action-button-color-2: #345;
+    --action-button-print-color: #eee8;
+    --action-button-shadow-color: rgba(0, 0, 0, 0.1);
+    --logo-size: 16px;
+    --logo-stripe-height: calc(var(--logo-size) / 8);
+    --display-frame-width: 96px;
+    --display-frame-height: 48px;
+    --display-frame-border-radius: 8px;
+    --volume-control-width: 64px;
+    --volume-control-height: 16px;
+    --primary-button-width: 96px;
+    --primary-button-height: 32px;
+    --primary-button-gap: 16px;
+    --primary-button-print-size: 16px;
+    --secondary-button-width: 64px;
+    --secondary-button-height: 32px;
+    --secondary-button-gap: 16px;
+    --secondary-button-print-size: 16px;
+    --d-pad-length: 96px;
+    --d-pad-weight: 96px;
+    --d-pad-border-radius: 8px;
+    --d-pad-print-size: 16px;
+    --d-pad-weight-ratio: 33.33%; /* Use in mobile layout */
+    --action-button-size: 128px;
+    --action-button-margin: 64px;
+    --action-button-padding: 8px;
+    --action-button-print-size: 24px;
+    --action-button-size-ratio: 320 / 128; /* Use in mobile layout */
+    --action-button-margin-ratio: 20%; /* Use in mobile layout */
+
+    --close-doc-button-color: #fff;
+    --close-doc-button-bg-color: rgba(255, 0, 0, 0.5);
+    --close-doc-button-bg-color-action: rgba(255, 0, 0, 0.25);
+    --close-doc-button-padding: 16px;
+    --close-doc-button-print-size: 16px;
+
+    --document-color: #fff;
+    --document-bg-color: rgba(0, 0, 0, 0.75);
+    --document-max-width: 960px;
+    --document-margin: 16px;
+    --document-padding: 16px;
+    --document-anchor-color: #8cc;
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: var(--body-text);
+    background-color: var(--body-color-1);
+}
+#panel {
+    margin: 16px;
+}
+
+@media screen and (max-width: 720px) {
+    :root {
+        --display-frame-width: 8px;
+        --d-pad-print-size: 12px;
+        --action-button-print-size: 16px;
+        --primary-button-print-size: 12px;
+        --secondary-button-print-size: 12px;
+    }
+    #panel {
+        width: calc(100% - 32px);
+    }
+}

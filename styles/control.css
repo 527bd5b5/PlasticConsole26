@@ -1,0 +1,302 @@
+.volume-control-wrapper {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    bottom: calc((var(--display-frame-height) - var(--volume-control-height)) / 2);
+    right: var(--display-frame-width);
+    gap: 8px;
+}
+.volume-control-label {
+    user-select: none;
+    line-height: 1;
+    font-weight: bold;
+    font-size: var(--volume-control-height);
+    color: var(--body-color-2);
+}
+.volume-control {
+    appearance: none;
+    -webkit-appearance: none;
+    width: var(--volume-control-width);
+    height: calc(var(--volume-control-height) / 2);
+    margin: 0;
+    outline: none;
+    background: linear-gradient(
+        to right,
+        var(--volume-control-color-2) 0%,
+        var(--volume-control-color-3) 0%
+    );
+}
+.volume-control::-webkit-slider-runnable-track,
+.volume-control::-moz-range-track {
+    height: calc(var(--volume-control-height) / 2);
+    background: transparent;
+}
+.volume-control::-webkit-slider-thumb,
+.volume-control::-moz-range-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: var(--volume-control-height);
+    height: var(--volume-control-height);
+    border-radius: 2px;
+    border: none;
+    background-color: var(--volume-control-color-1);
+    box-shadow: 0 0 4px var(--shadow-color);
+}
+.control-frame-1,
+.control-frame-2 {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    margin-top: var(--display-frame-height);
+}
+.control-frame-1 {
+    justify-content: center;
+}
+.control-frame-2 {
+    justify-content: space-between;
+}
+.primary-button-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--primary-button-gap);
+}
+.secondary-button-wrapper {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    right: 0;
+    gap: var(--secondary-button-gap);
+    transform: translateY(-50%);
+}
+.primary-button {
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--primary-button-width);
+    height: var(--primary-button-height);
+    line-height: 1;
+    font-weight: bold;
+    font-size: var(--primary-button-print-size);
+    border-radius: calc(var(--primary-button-height) / 2);
+    color: var(--primary-button-print-color);
+    background-color: var(--primary-button-color);
+    box-shadow: 0 0 4px var(--shadow-color);
+}
+.secondary-button {
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--secondary-button-width);
+    height: var(--secondary-button-height);
+    line-height: 1;
+    font-weight: bold;
+    font-size: var(--secondary-button-print-size);
+    border: none;
+    border-radius: calc(var(--secondary-button-height) / 2);
+    color: var(--secondary-button-print-color);
+    background-color: var(--secondary-button-color);
+    box-shadow: inset 0 0 4px var(--shadow-color);
+}
+.primary-button.pressed {
+    background-image: linear-gradient(var(--primary-button-shadow-color));
+    box-shadow: 0 0 2px var(--shadow-color);
+}
+.secondary-button:active {
+    background-image: linear-gradient(var(--secondary-button-shadow-color));
+    box-shadow: inset 0 0 4px var(--shadow-color);
+}
+.primary-button > span,
+.secondary-button > span {
+    pointer-events: none;
+}
+.primary-button.pressed > span,
+.secondary-button:active > span {
+    margin-top: 2px;
+}
+#d-pad-body {
+    display: grid;
+    grid-template-columns: var(--d-pad-length) var(--d-pad-weight) var(--d-pad-length);
+    grid-template-rows: var(--d-pad-length) var(--d-pad-weight) var(--d-pad-length);
+    width: calc(var(--d-pad-length) * 2 + var(--d-pad-weight));
+    height: calc(var(--d-pad-length) * 2 + var(--d-pad-weight));
+    border-radius: 50%;
+    background-color: var(--d-pad-color);
+    box-shadow: 0 0 4px var(--shadow-color);
+}
+#d-pad-body.up {
+    background-image: linear-gradient(0deg, transparent, var(--d-pad-shadow-color));
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+#d-pad-body.up-right {
+    background-image: linear-gradient(45deg, transparent, var(--d-pad-shadow-color));
+    box-shadow: -2px 2px 4px var(--shadow-color);
+}
+#d-pad-body.right {
+    background-image: linear-gradient(90deg, transparent, var(--d-pad-shadow-color));
+    box-shadow: -2px 0 4px var(--shadow-color);
+}
+#d-pad-body.down-right {
+    background-image: linear-gradient(135deg, transparent, var(--d-pad-shadow-color));
+    box-shadow: -2px -2px 4px var(--shadow-color);
+}
+#d-pad-body.down {
+    background-image: linear-gradient(180deg, transparent, var(--d-pad-shadow-color));
+    box-shadow: 0 -2px 4px var(--shadow-color);
+}
+#d-pad-body.down-left {
+    background-image: linear-gradient(225deg, transparent, var(--d-pad-shadow-color));
+    box-shadow: 2px -2px 4px var(--shadow-color);
+}
+#d-pad-body.left {
+    background-image: linear-gradient(270deg, transparent, var(--d-pad-shadow-color));
+    box-shadow: 2px 0 4px var(--shadow-color);
+}
+#d-pad-body.up-left {
+    background-image: linear-gradient(315deg, transparent, var(--d-pad-shadow-color));
+    box-shadow: 2px 2px 4px var(--shadow-color);
+}
+#d-pad-body * {
+    user-select: none;
+}
+.d-pad {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.d-pad > span {
+    pointer-events: none;
+}
+.arrow {
+    display: block;
+    width: var(--d-pad-print-size);
+    height: calc(tan(60deg) * var(--d-pad-print-size) / 2);
+    background: var(--d-pad-print-color);
+}
+.arrow.up-arrow {
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.arrow.down-arrow {
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+.arrow.left-arrow {
+  clip-path: polygon(0 50%, 100% 0, 100% 100%);
+}
+.arrow.right-arrow {
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+#d-pad-body.up .arrow,
+#d-pad-body.up-left .arrow,
+#d-pad-body.up-right .arrow {
+    margin-bottom: 2px;
+}
+#d-pad-body.left .arrow,
+#d-pad-body.up-left .arrow,
+#d-pad-body.down-left .arrow {
+    margin-right: 2px;
+}
+#d-pad-body.right .arrow,
+#d-pad-body.up-right .arrow,
+#d-pad-body.down-right .arrow {
+    margin-left: 2px;
+}
+#d-pad-body.down .arrow,
+#d-pad-body.down-left .arrow,
+#d-pad-body.down-right .arrow {
+    margin-top: 2px;
+}
+#action-button-body {
+    display: grid;
+    grid-template-columns: var(--action-button-size) var(--action-button-margin) var(--action-button-size);
+    width: calc(var(--action-button-size) * 2 + var(--action-button-margin));
+    height: var(--action-button-size);
+    border-radius: calc(var(--action-button-size) / 2);
+    background-color: var(--action-button-color-1);
+    box-shadow: 0 0 4px var(--shadow-color);
+}
+#action-button-body * {
+    user-select: none;
+}
+#action-button-body.b {
+    background-image: linear-gradient(270deg, transparent, var(--action-button-shadow-color));
+    box-shadow: 2px 0 4px var(--shadow-color);
+}
+#action-button-body.a-b {
+    background-image: linear-gradient(var(--action-button-shadow-color));
+    box-shadow: 0 0 2px var(--shadow-color);
+}
+#action-button-body.a {
+    background-image: linear-gradient(90deg, transparent, var(--action-button-shadow-color));
+    box-shadow: -2px 0 4px var(--shadow-color);
+}
+.action-button {
+    padding: var(--action-button-padding);
+}
+#action-button-body.b > .action-button {
+    padding-left: calc(var(--action-button-padding) - 1px);
+    padding-right: calc(var(--action-button-padding) + 1px);
+}
+#action-button-body.a > .action-button {
+    padding-left: calc(var(--action-button-padding) + 1px);
+    padding-right: calc(var(--action-button-padding) - 1px);
+}
+.action-button > div {
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    line-height: 1;
+    font-weight: bold;
+    font-size: var(--action-button-print-size);
+    border-radius: 50%;
+    color: var(--action-button-print-color);
+    background-color: var(--action-button-color-2);
+}
+#action-button-body.b > #action-button-b > div,
+#action-button-body.a-b > #action-button-a > div,
+#action-button-body.a-b > #action-button-b > div,
+#action-button-body.a > #action-button-a > div {
+    background-image: linear-gradient(var(--action-button-shadow-color));
+}
+.action-button > div > span {
+    pointer-events: none;
+}
+#action-button-body.b > .action-button > div > span {
+    margin-right: 1px;
+}
+#action-button-body.a > .action-button > div > span {
+    margin-left: 1px;
+}
+
+@media screen and (max-width: 720px) {
+    #d-pad-body {
+        grid-template-columns: auto var(--d-pad-weight-ratio) auto;
+        grid-template-rows: auto var(--d-pad-weight-ratio) auto;
+        width: calc(50% - var(--display-frame-height) / 2);
+        height: auto;
+        aspect-ratio: 1;
+    }
+    #action-button-body {
+        grid-template-columns: auto var(--action-button-margin-ratio) auto;
+        width: calc(50% - var(--display-frame-height) / 2);
+        height: auto;
+        aspect-ratio: var(--action-button-size-ratio);
+    }
+    .secondary-button-wrapper {
+        position: relative;
+        left: var(--secondary-button-gap);
+        transform: translateY(0);
+    }
+    .primary-button,
+    .secondary-button {
+        width: auto;
+        padding: 0 calc(var(--primary-button-height) / 2);
+    }
+}

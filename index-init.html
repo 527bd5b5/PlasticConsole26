@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html lang="ja-JP">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, user-scalable=no" />
+        <title>PC-26</title>
+        <link href="styles/root.css" rel="stylesheet" />
+        <link href="styles/display.css" rel="stylesheet" />
+        <link href="styles/control.css" rel="stylesheet" />
+        <link href="styles/document.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div id="panel">
+            <div id="display-frame">
+                <div class="logo-stripe">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="logo">Plastic Console 26</div>
+                <canvas id="display" width="512" height="384"></canvas>
+                <div class="volume-control-wrapper">
+                    <span class="volume-control-label">SE</span>
+                    <input
+                        id="volume-se"
+                        class="volume-control"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="10"
+                        value="0"
+                    />
+                    <span class="volume-control-label">BGM</span>
+                    <input
+                        id="volume-bgm"
+                        class="volume-control"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="10"
+                        value="0"
+                    />
+                </div>
+            </div>
+            <div class="control-frame-1">
+                <div class="primary-button-wrapper">
+                    <div id="primary-button-select" class="primary-button">
+                        <span>SELECT</span>
+                    </div>
+                    <div id="primary-button-start" class="primary-button">
+                        <span>START</span>
+                    </div>
+                </div>
+                <div class="secondary-button-wrapper">
+                    <button class="secondary-button" onclick="openDocument()">
+                        <span>DOC</span>
+                    </button>
+                </div>
+            </div>
+            <div class="control-frame-2">
+                <div id="d-pad-body">
+                    <div id="d-pad-top-left"></div>
+                    <div id="d-pad-top" class="d-pad">
+                        <span class="arrow up-arrow"></span>
+                    </div>
+                    <div id="d-pad-top-right"></div>
+                    <div id="d-pad-left" class="d-pad">
+                        <span class="arrow left-arrow"></span>
+                    </div>
+                    <div></div>
+                    <div id="d-pad-right" class="d-pad">
+                        <span class="arrow right-arrow"></span>
+                    </div>
+                    <div id="d-pad-bottom-left"></div>
+                    <div id="d-pad-bottom" class="d-pad">
+                        <span class="arrow down-arrow"></span>
+                    </div>
+                    <div id="d-pad-bottom-right"></div>
+                </div>
+                <div id="action-button-body">
+                    <div id="action-button-b" class="action-button">
+                        <div>
+                            <span>B</span>
+                        </div>
+                    </div>
+                    <div id="action-button-a-b"></div>
+                    <div id="action-button-a" class="action-button">
+                        <div>
+                            <span>A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="document-wrapper" class="hide">
+            <div id="document-frame">
+                <button id="close-document-button" onclick="closeDocument()">CLOSE</button>
+                <div id="document">
+                    <img class="banner" src="thumbnail.jpg" />
+
+                    <h1>TITLE</h1>
+
+                    <h2>HEADING</h2>
+
+                    <p>BODY</p>
+                </div>
+            </div>
+        </div>
+        <script src="scripts/document.js"></script>
+        <script src="scripts/control.js"></script>
+        <script src="scripts/canvas.js"></script>
+        <script src="scripts/audio.js"></script>
+        <script src="scripts/util.js"></script>
+        <script src="scripts/game-init.js"></script><!-- script src="scripts/game.js"></script -->
+        <script src="scripts/system.js"></script>
+    </body>
+</html>
