@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <title>Generate Subset List for FontForge</title>
+        <style>
+            textarea {
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Generate Subset List for FontForge</h1>
+
+        <section>
+            <label>Input:</label>
+            <textarea id="input-textarea" cols="80" rows="5"></textarea>
+        </section>
+
+        <section>
+            <button onclick="generateSubsetList()">Generate</button>
+        </section>
+
+        <section>
+            <label>Output:</label>
+            <textarea id="output-textarea" cols="80" rows="5"></textarea>
+        </section>
+
+        <script>
+            function generateSubsetList() {
+                const inputString = document.getElementById('input-textarea').value.replaceAll('\n', '');
+                const inputStringLength = [...inputString].length;
+                const outputTextList = ['SelectWorthOutputting();'];
+
+                for (let i = 0; i < inputStringLength; i++)
+                    outputTextList.push(`SelectFewer(0x${inputString.codePointAt(i).toString(16)});`);
+
+                document.getElementById('output-textarea').value = outputTextList.join('\n');
+            }
+        </script>
+    </body>
+</html>

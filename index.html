@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+
+<html lang="ja-JP">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no, user-scalable=no" />
+        <title>PC-26</title>
+        <link href="styles/root.css" rel="stylesheet" />
+        <link href="styles/display.css" rel="stylesheet" />
+        <link href="styles/control.css" rel="stylesheet" />
+        <link href="styles/document.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div id="panel">
+            <div id="display-frame">
+                <div class="logo-stripe">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="logo">Plastic Console 26</div>
+                <canvas id="display" width="512" height="384"></canvas>
+                <div class="volume-control-wrapper">
+                    <span class="volume-control-label">SE</span>
+                    <input
+                        id="volume-se"
+                        class="volume-control"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="10"
+                        value="0"
+                    />
+                    <span class="volume-control-label">BGM</span>
+                    <input
+                        id="volume-bgm"
+                        class="volume-control"
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="10"
+                        value="0"
+                    />
+                </div>
+            </div>
+            <div class="control-frame-1">
+                <div class="primary-button-wrapper">
+                    <div id="primary-button-select" class="primary-button">
+                        <span>SELECT</span>
+                    </div>
+                    <div id="primary-button-start" class="primary-button">
+                        <span>START</span>
+                    </div>
+                </div>
+                <div class="secondary-button-wrapper">
+                    <button class="secondary-button" onclick="openDocument()">
+                        <span>DOC</span>
+                    </button>
+                </div>
+            </div>
+            <div class="control-frame-2">
+                <div id="d-pad-body">
+                    <div id="d-pad-top-left"></div>
+                    <div id="d-pad-top" class="d-pad">
+                        <span class="arrow up-arrow"></span>
+                    </div>
+                    <div id="d-pad-top-right"></div>
+                    <div id="d-pad-left" class="d-pad">
+                        <span class="arrow left-arrow"></span>
+                    </div>
+                    <div></div>
+                    <div id="d-pad-right" class="d-pad">
+                        <span class="arrow right-arrow"></span>
+                    </div>
+                    <div id="d-pad-bottom-left"></div>
+                    <div id="d-pad-bottom" class="d-pad">
+                        <span class="arrow down-arrow"></span>
+                    </div>
+                    <div id="d-pad-bottom-right"></div>
+                </div>
+                <div id="action-button-body">
+                    <div id="action-button-b" class="action-button">
+                        <div>
+                            <span>B</span>
+                        </div>
+                    </div>
+                    <div id="action-button-a-b"></div>
+                    <div id="action-button-a" class="action-button">
+                        <div>
+                            <span>A</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="document-wrapper" class="hide">
+            <div id="document-frame">
+                <button id="close-document-button" onclick="closeDocument()">CLOSE</button>
+                <div id="document">
+                    <!-- Start of sample -->
+
+                    <script>
+const SPAN_MOD = '<span style="color: #ccc">';
+const SPAN_RETURN = '<span style="color: #f8f">';
+const SPAN_VAR = '<span style="color: #0ff">';
+const SPAN_TYPE = '<span style="color: #0c8">';
+const SPAN_INIT = '<span style="color: #f80">';
+const SPAN_FUNC = '<span style="color: #ff0">';
+const SPAN_CLASS = '<span style="color: #0f8">';
+const SPAN_END = '</span>';
+
+const DESC_STATIC = SPAN_MOD + '[static]' + SPAN_END;
+const DESC_ASYNC = SPAN_MOD + '[async]' + SPAN_END;
+const DESC_CLASS = SPAN_MOD + '[class]' + SPAN_END;
+
+function createVariableDescription(data) {
+    const dataName = data.name === 'return'
+        ? SPAN_RETURN + data.name + SPAN_END
+        : `<b>${SPAN_VAR + data.name + SPAN_END}</b>`;
+
+    const dataType = data.type instanceof Array ? 'object{ ... }' : data.type;
+
+    const varText =
+        `${dataName}: ${SPAN_TYPE + dataType + SPAN_END}` +
+        `${data.static ? ' ' + DESC_STATIC : ''}` +
+        `${data.init !== undefined ? ` = ${SPAN_INIT + data.init + SPAN_END}` : ''}<br />${data.desc}`;
+
+    if (data.type instanceof Array) {
+        const argsText = createVariableDescriptionList(data.type);
+
+        return `<li>${varText}</li><ul>${argsText}</ul>`;
+    } else {
+        return `<li>${varText}</li>`;
+    }
+}
+
+function createVariableDescriptionList(itemList) {
+    return itemList?.map((item) => createVariableDescription(item)).join('') || '';
+}
+
+function createFunctionDescription(data) {
+    const funcText =
+        `<b>${SPAN_FUNC + data.name + SPAN_END}(</b>` +
+        (data.args?.map((argv) => SPAN_VAR + argv.name + SPAN_END).join(', ') || '') +
+        '<b>)</b>' +
+        (data.static ? ' ' + DESC_STATIC : '') +
+        (data.async ? ' ' + DESC_ASYNC : '') +
+        `<br />${data.desc}`;
+
+    let argsText = createVariableDescriptionList(data.args);
+
+    if (data.return !== undefined) {
+        data.return.name = 'return';
+
+        argsText += createVariableDescription(data.return);
+    }
+
+    return `<li>${funcText}</li><ul>${argsText}</ul>`;
+}
+
+function createFunctionDescriptionList(itemList) {
+    return itemList?.map((item) => createFunctionDescription(item)).join('');
+}
+
+function createClassDescription(data) {
+    const classText = `<b>${SPAN_CLASS + data.name + SPAN_END}</b> ${DESC_CLASS}<br />${data.desc}`;
+    const propText = createVariableDescriptionList(data.prop);
+    const methodText = createFunctionDescriptionList(data.method);
+
+    return `<li>${classText}</li><ul>${propText}${methodText}</ul>`;
+}
+
+function createClassDescriptionList(itemList) {
+    return itemList?.map((item) => createClassDescription(item)).join('');
+}
+                    </script>
+
+                    <img class="banner" src="thumbnail.jpg" />
+
+                    <h1>PC-26: Plastic Console 26</h1>
+
+                    <h2>概要</h2>
+
+                    <p>「PC-26: Plastic Console 26」は純粋なHTML（HyperText Markup Language）、CSS（Cascading Style Sheets）、JavaScriptでレトロ風のゲームを簡単に制作・実行するためのテンプレート、フレームワーク、ゲームエンジンの一種です。多くのプラットフォームに対応した標準的かつ最小限の入力機能と出力機能が用意されているため、開発者はゲームの開発に集中することができます。</p>
+
+                    <h2>仕様</h2>
+
+                    <p>デフォルトの仕様は以下の通りです。</p>
+
+                    <ul>
+                        <li>入力</li>
+                        <ul>
+                            <li>2個のスライダー (音量調整用)</li>
+                            <li>4個のボタン</li>
+                            <li>1個の十字キー</li>
+                        </ul>
+                        <li>出力</li>
+                        <ul>
+                            <li>ゲーム画面</li>
+                            <ul>
+                                <li>横解像度: 512 px (32タイル)</li>
+                                <li>縦解像度: 384 px (24タイル)</li>
+                                <li>リフレッシュレート: 30 Hz</li>
+                            </ul>
+                            <li>ゲーム音源</li>
+                            <ul>
+                                <li>効果音: 4トラック</li>
+                                <li>背景音: 2トラック</li>
+                            </ul>
+                        </ul>
+                        <li>推奨環境</li>
+                        <ul>
+                            <li>レンダリングエンジン:</li>
+                            <ul>
+                                <li>Gecko (Firefox等)</li>
+                                <li>WebKit (Safari等)</li>
+                                <li>Blink (Google Chrome等)</li>
+                            </ul>
+                            <li>ディスプレイ</li>
+                            <ul>
+                                <li>横解像度: 960 px以上</li>
+                                <li>縦解像度: 960 px以上</li>
+                            </ul>
+                        </ul>
+                        <li>利用API:</li>
+                        <ul>
+                            <li>Canvas API</li>
+                            <li>Web Audio API</li>
+                        </ul>
+                    </ul>
+
+                    <h2>操作方法</h2>
+
+                    <p>キーボード操作（PC想定）とマルチタッチ操作（モバイル想定）に対応しています。マルチタッチ操作の場合、十字キーの斜め入力やAボタンとBボタンの同時押しが可能です。キーとコマンドの対応については以下の通りです。</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>キー</th>
+                                <th>コマンド</th>
+                                <th>キー</th>
+                                <th>コマンド</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>W, ↑</td>
+                                <td>上</td>
+                                <td>L, X</td>
+                                <td>Aボタン</td>
+                            </tr>
+                            <tr>
+                                <td>A, ←</td>
+                                <td>左</td>
+                                <td>K, Z</td>
+                                <td>Bボタン</td>
+                            </tr>
+                            <tr>
+                                <td>S, ↓</td>
+                                <td>下</td>
+                                <td>P</td>
+                                <td>STARTボタン</td>
+                            </tr>
+                            <tr>
+                                <td>D, →</td>
+                                <td>右</td>
+                                <td>O</td>
+                                <td>SELECTボタン</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2>使用物</h2>
+
+                    <ul>
+                        <li>ソフトウェア</li>
+                        <ul>
+                            <li><a href="https://fontforge.org/en-US/" target="_blank">FontForge</a></li>
+                            <li><a href="https://github.com/kreativekorp/bitsnpicas" target="_blank">Bits'N'Picas</a></li>
+                        </ul>
+                        <li>フォント</li>
+                        <ul>
+                            <li><a href="https://akahuku.github.io/ufo/" target="_blank">UFO: Unicode Font, Organized</a></li>
+                        </ul>
+                        <li>音源</li>
+                        <ul>
+                            <li><a href="https://peritune.com/" target="_blank">PeriTune</a></li>
+                            <li><a href="https://soundeffect-lab.info/" target="_blank">効果音ラボ</a></li>
+                        </ul>
+                    </ul>
+
+                    <h2>ライセンス</h2>
+
+                    <p>全てのコード、及び私が作成した画像は<a href="https://ja.wikipedia.org/wiki/WTFPL" target="_blank">WTFPL</a>に基いて利用、複製、頒布が可能です（つまり、自由です）。その他のメディアについては配布元のライセンスを遵守してください。</p>
+
+                    <h2>ローカル環境での実行について</h2>
+
+                    <p>本ウェブサイトをローカル環境で実行した（ファイルとして開いた）場合、ブラウザーのセキュリティー機能によりエラーが発生する可能性があります。この問題は以下の手順で解決できます。</p>
+
+                    <p>参考: <a href="https://yujisoftware.hatenablog.com/entry/20100815/1281885412" target="_blank">https://yujisoftware.hatenablog.com/entry/20100815/1281885412</a></p>
+
+                    <h3>Firefoxの場合</h3>
+
+                    <p>アドレスバーに「<a href="about:config" target="_blank">about:config</a>」と入力し、「security.fileuri.strict_origin_policy」を「false」に設定します。</p>
+
+                    <h3>Google Chromeの場合</h3>
+
+                    <p>実行引数に「--allow-file-access-from-files」を追加します。</p>
+
+                    <h2>構成</h2>
+
+                    <h3>generate-subset-list-for-font-forge.html</h3>
+
+                    <p><a href="https://fontforge.org/en-US/" target="_blank">FontForge</a>でサブセットに含まれないシンボルを（削除するために）一括選択するFontForgeスクリプトを作成する簡易的なユーティリティーです。他のフォントや言語をサブセットする場合に便利です。</p>
+
+                    <h3>index.html</h3>
+
+                    <p>PC-26を実行するためのHTMLファイルです。開発者は後半に記述された説明書（これ）を編集する必要があります。デザインやシステムを正しく改造する場合はCSSやJavaScriptに関する中級程度の知識とソースコードの理解が要求されます。</p>
+
+                    <h3>index-init.html</h3>
+
+                    <p><a href="index.html">index.html</a>の初期状態が記述されています。</p>
+
+                    <h3>README.md</h3>
+
+                    <p>本プロジェクトの説明（これ）をMarkdown形式で纏めたファイルです。</p>
+
+                    <h3>thumbnail.jpg</h3>
+
+                    <p>ゲームのパッケージ画像です。横1920 px、縦640 px、縦横比3対1の画像が推奨されます。</p>
+
+                    <h3>fonts/</h3>
+
+                    <p>ゲーム画面（キャンバス）で使用するフォントを格納する場所です。デフォルトでは全角・半角のラテン文字（ラテン1補助等を含む）、キリル文字（拡張を含まない）、ひらがな、カタカナ、漢字（JIS第2水準まで）、数字、記号をサブセットしたTTF（TrueType Font）形式のコンソール向けビットマップフォント「<a href="https://akahuku.github.io/ufo/" target="_blank">UFO: Unicode Font, Organized</a>」が含まれています。他のフォントを使用する場合は<a href="scripts/system.js">system.js</a>に設定を追加する必要があります。</p>
+
+                    <h3>images/</h3>
+
+                    <p>ゲーム画面に描画するキャクターや背景のグラフィックを格納する場所です。JavaScriptで画像を拡縮する場合、デフォルトではピクセルアートの表現を優先して画像が平滑化（スムージング）されないことに注意してください。サンプルとしてキャラクターのスプライト画像が含まれています。</p>
+
+                    <h3>scripts/</h3>
+
+                    <p>PC-26に必要なJavaScriptファイルを格納する場所です。一部のファイルについては、不用意に改変するとシステムが正常に動作しなくなる場合があります。</p>
+
+                    <ul>
+                        <li>座標や寸法の単位はピクセルです。</li>
+                        <li>座標は左上が基準（X: 0, Y: 0）です。</li>
+                        <li>色はキーワード（例: "white"）、16進数カラーコード（例: "#fff"）、RGB（例: "rgb(255, 255, 255)"）、HSL（例: "hsl(0, 0%, 100%)"）等の形式に対応しています。</li>
+                    </ul>
+
+                    <h3>scripts/audio.js</h3>
+
+                    <p>ゲーム音源に関する汎用的なクラスや関数が記述されています。</p>
+
+                    <ul>
+                        <script>
+document.currentScript.insertAdjacentHTML('afterend', createClassDescriptionList([
+    {
+        name: 'SoundEffect',
+        desc: '効果音を管理するクラスです。',
+        method: [
+            {
+                name: 'constructor',
+                desc: 'クラスを作成します。',
+                args: [
+                    {
+                        name: 'audioPath',
+                        type: 'string',
+                        desc: '音源ファイルのパスを指定します。'
+                    }
+                ]
+            },
+            {
+                name: 'load',
+                async: true,
+                desc: '音源ファイルをサーバーから取得してAudioContext向けのデータを作成します。',
+                return: {
+                    type: 'Promise',
+                    desc: 'プロミスを返します。'
+                }
+            },
+            {
+                name: 'play',
+                desc: '音源を再生します。短期間に大量（デフォルトでは5個以上）の音源が再生された場合、古い音源は自動的に停止・破棄されます。',
+                args: [
+                    {
+                        name: 'volume',
+                        type: 'number',
+                        init: '1',
+                        desc: '音量（0.0〜1.0）を指定します。'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        name: 'BackgroundMusic',
+        desc: '背景音を管理するクラスです。',
+        method: [
+            {
+                name: 'constructor',
+                desc: 'クラスを作成します。',
+                args: [
+                    {
+                        name: 'audioPath',
+                        type: 'string',
+                        desc: '音源ファイルのパスを指定します。'
+                    }
+                ]
+            },
+            {
+                name: 'load',
+                async: true,
+                desc: '音源ファイルをサーバーから取得してAudioContext向けのデータを作成します。',
+                return: {
+                    type: 'Promise',
+                    desc: 'プロミスを返します。'
+                }
+            },
+            {
+                name: 'changeVolume',
+                desc: '音量を変更します。',
+                args: [
+                    {
+                        name: 'volume',
+                        type: 'number',
+                        desc: '新しい音量（0.0〜1.0）を指定します。'
+                    },
+                    {
+                        name: 'transition',
+                        type: 'number',
+                        init: '0',
+                        desc: '新しい音量へ遷移する秒数（0.0秒〜）を指定します。'
+                    }
+                ]
+            },
+            {
+                name: 'play',
+                desc: '音源を再生します。デフォルトではクロスフェードを考慮して2個まで音源を再生することができます。',
+                args: [
+                    {
+                        name: 'volume',
+                        type: 'number',
+                        init: '1',
+                        desc: '音量（0.0〜1.0）を指定します。'
+                    },
+                    {
+                        name: 'fadeInTime',
+                        type: 'number',
+                        init: '0',
+                        desc: 'フェードインの秒数（0.0秒〜）を指定します。'
+                    },
+                    {
+                        name: 'loop',
+                        type: 'boolean',
+                        init: 'false',
+                        desc: '真の場合は音源を繰り返し再生します。'
+                    },
+                    {
+                        name: 'onEnded',
+                        type: 'function()',
+                        init: 'null',
+                        desc: '再生終了後に任意の関数を実行します。メソッド「stop」で停止された場合や引数「loop」が真の場合は実行されません。'
+                    }
+                ]
+            },
+            {
+                name: 'pause',
+                desc: '音源の再生を一時停止します。',
+                args: [
+                    {
+                        name: 'fadeOutTime',
+                        type: 'number',
+                        init: '0',
+                        desc: 'フェードアウトの秒数（0.0秒〜）を指定します。'
+                    }
+                ]
+            },
+            {
+                name: 'resume',
+                desc: '音源の再生を再開します。',
+                args: [
+                    {
+                        name: 'fadeInTime',
+                        type: 'number',
+                        init: '0',
+                        desc: 'フェードインの秒数（0.0秒〜）を指定します。'
+                    }
+                ]
+            },
+            {
+                name: 'stop',
+                desc: '音源の再生を停止します。メソッド「play」で始めから再生することができます。',
+                args: [
+                    {
+                        name: 'fadeOutTime',
+                        type: 'number',
+                        init: '0',
+                        desc: 'フェードアウトの秒数（0.0秒〜）を指定します。'
+                    },
+                    {
+                        name: 'onEnded',
+                        type: 'function()',
+                        init: 'null',
+                        desc: '再生停止後に任意の関数を実行します。'
+                    }
+                ]
+            },
+            {
+                name: 'toggle',
+                desc: '音源の再生や停止を切り替えます。音源が再生されている場合は一時停止、一時停止している場合は再開、停止している場合は始めから再生します。',
+                args: [
+                    {
+                        name: 'fadeTime',
+                        type: 'number',
+                        init: '0',
+                        desc: 'フェードインやフェードアウトの秒数（0.0秒〜）を指定します。'
+                    },
+                    {
+                        name: 'playArgs',
+                        type: 'object{ volume, loop, onEnded }',
+                        init: 'null',
+                        desc: '再生開始時の引数を指定します。'
+                    }
+                ]
+            }
+        ]
+    }
+]));
+                        </script>
+                    </ul>
+
+                    <h3>scripts/canvas.js</h3>
+
+                    <p>ゲーム画面に関する汎用的なクラスや関数が記述されています。</p>
+
+                    <ul>
+                        <script>
+document.currentScript.insertAdjacentHTML('afterend',
+    createClassDescriptionList([
+        {
+            name: 'Sprite',
+            desc: 'スプライト（連番画像）を管理するクラスです。スプライトと名付けられていますが、1枚の画像から連番画像を生成する機能はなく、単純に複数枚の画像ファイルの管理を容易にするためのクラスです。',
+            method: [
+                {
+                    name: 'constructor',
+                    desc: 'クラスを作成します。',
+                    args: [
+                        {
+                            name: 'imageList',
+                            type: 'object[]',
+                            desc: '画像ファイルのパスの一覧もしくは画像データの一覧を指定します。後者の場合、メソッド「load」を実行する必要はありません。'
+                        },
+                        {
+                            name: 'width',
+                            type: 'int',
+                            init: '0',
+                            desc: 'スプライトの横幅を指定します。指定がない（0以下の）場合は各画像の横幅が使用されます。'
+                        },
+                        {
+                            name: 'height',
+                            type: 'int',
+                            init: '0',
+                            desc: 'スプライトの縦幅を指定します。指定がない（0以下の）場合は各画像の縦幅が使用されます。'
+                        },
+                        {
+                            name: 'r',
+                            type: 'int',
+                            init: '-1',
+                            desc: '画像を透過処理（クロマキー）する際のRGB値のR（0〜255）を指定します。'
+                        },
+                        {
+                            name: 'g',
+                            type: 'int',
+                            init: '-1',
+                            desc: '画像を透過処理する際のRGB値のG（0〜255）を指定します。'
+                        },
+                        {
+                            name: 'b',
+                            type: 'int',
+                            init: '-1',
+                            desc: '画像を透過処理する際のRGB値のB（0〜255）を指定します。指定がない（0未満の）場合は画像を透過しません。'
+                        }
+                    ]
+                },
+                {
+                    name: 'load',
+                    async: true,
+                    desc: '全ての画像ファイルをサーバーから取得してデータを作成します。'
+                },
+                {
+                    name: 'draw',
+                    desc: 'ゲーム画面にスプライトを描画します。',
+                    args: [
+                        {
+                            name: 'posX',
+                            type: 'int',
+                            desc: 'スプライトを描画するX座標を指定します。'
+                        },
+                        {
+                            name: 'posY',
+                            type: 'int',
+                            desc: 'スプライトを描画するY座標を指定します。'
+                        },
+                        {
+                            name: 'index',
+                            type: 'int',
+                            desc: 'スプライトのインデックスを指定します。'
+                        }
+                    ]
+                }
+            ]
+        }
+    ]) + createFunctionDescriptionList([
+        {
+            name: 'fillRect',
+            desc: 'ゲーム画面に長方形を描画します。',
+            args: [
+                {
+                    name: 'posX',
+                    type: 'int',
+                    desc: '長方形を描画するX座標を指定します。'
+                },
+                {
+                    name: 'posY',
+                    type: 'int',
+                    desc: '長方形を描画するY座標を指定します。'
+                },
+                {
+                    name: 'sizeX',
+                    type: 'int',
+                    desc: '長方形の横幅（1 px〜）を指定します。'
+                },
+                {
+                    name: 'sizeY',
+                    type: 'int',
+                    desc: '長方形の縦幅（1 px〜）を指定します。'
+                },
+                {
+                    name: 'color',
+                    type: 'string',
+                    desc: '長方形の色を指定します。'
+                },
+                {
+                    name: 'width',
+                    type: 'int',
+                    init: '0',
+                    desc: '枠線の太さを指定します。指定がない（0の）場合は枠線を描画しません。'
+                },
+                {
+                    name: 'offset',
+                    type: 'StrokeOffset{}',
+                    init: 'StrokeOffset.MIDDLE',
+                    desc: '枠の基準を指定します。「StrokeOffset.OUT」の場合は長方形の外側、「StrokeOffset.MIDDLE」の場合は長方形の境界、「StrokeOffset.IN」の場合は長方形の内側に枠線が描画されます。'
+                },
+                {
+                    name: 'strokeColor',
+                    type: 'string',
+                    init: 'null',
+                    desc: '枠線の色を指定します。指定がない（nullの）場合は長方形と同じ色が使用されます。'
+                }
+            ]
+        },
+        {
+            name: 'fillText',
+            desc: 'ゲーム画面にテキストを描画します。',
+            args: [
+                {
+                    name: 'text',
+                    type: 'string',
+                    desc: 'テキストを指定します。複数行に対応しています。'
+                },
+                {
+                    name: 'posX',
+                    type: 'int',
+                    desc: 'テキストを描画するX座標を指定します。'
+                },
+                {
+                    name: 'posY',
+                    type: 'int',
+                    desc: 'テキストを描画するY座標を指定します。'
+                },
+                {
+                    name: 'color',
+                    type: 'string',
+                    desc: 'テキストの色を指定します。'
+                },
+                {
+                    name: 'option',
+                    init: 'null',
+                    desc: 'その他の設定を指定します。',
+                    type: [
+                        {
+                            name: 'sizeX',
+                            type: 'int',
+                            init: '0',
+                            desc: 'テキストボックスの横幅を指定します。指定がない（0以下の）場合は折り返しされません。'
+                        },
+                        {
+                            name: 'sizeY',
+                            type: 'int',
+                            init: '0',
+                            desc: 'テキストボックスの縦幅を指定します。指定がない（0以下の）場合は全ての行が描画されます。'
+                        },
+                        {
+                            name: 'textAlign',
+                            type: 'TextAlign{}',
+                            init: 'TextAlign.LEFT',
+                            desc: 'テキストの水平方向の配置を指定します。「TextAlign.LEFT」の場合は左揃え、「TextAlign.CENTER」の場合は中央揃え、「TextAlign.RIGHT」の場合は右揃えになります。プロパティー「sizeX」が指定されていない場合は適用されません。'
+                        },
+                        {
+                            name: 'verticalAlign',
+                            type: 'VerticalAlign{}',
+                            init: 'VerticalAlign.TOP',
+                            desc: 'テキストの垂直方向の配置を指定します。「VerticalAlign.TOP」の場合は上揃え、「VerticalAlign.CENTER」の場合は中央揃え、「VerticalAlign.BOTTOM」の場合は下揃えになります。プロパティー「sizeY」が指定されていない場合は適用されません。'
+                        },
+                        {
+                            name: 'lineGap',
+                            type: 'int',
+                            init: '0',
+                            desc: '行間を指定します。'
+                        },
+                        {
+                            name: 'fontSize',
+                            type: 'int',
+                            init: '16',
+                            desc: '文字の大きさ（1 px〜）を指定します。'
+                        },
+                        {
+                            name: 'fontName',
+                            type: 'string',
+                            init: '"ufo"',
+                            desc: 'グローバル変数「fontList」に存在するフォント名を指定します。システムフォントも指定可能ですが、実行環境に依存するため推奨されません。'
+                        },
+                        {
+                            name: 'backgroundColor',
+                            type: 'string',
+                            init: 'null',
+                            desc: 'テキストの背景色を指定します。指定がない（nullの）場合は描画されません。'
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            name: 'createImage',
+            async: true,
+            desc: '画像ファイルをサーバーから取得してデータを作成します。',
+            args: [
+                {
+                    name: 'imagePath',
+                    type: 'string',
+                    desc: '画像ファイルのパスを指定します。'
+                }
+            ],
+            return: {
+                type: 'Image',
+                desc: '画像データを返します。'
+            }
+        },
+        {
+            name: 'drawImage',
+            desc: 'ゲーム画面に画像を描画します。',
+            args: [
+                {
+                    name: '...args',
+                    type: 'args',
+                    desc: 'Canvas 2D APIが提供するメソッド「drawImage」と同様の引数を指定します。詳細は「<a href="https://developer.mozilla.org/ja/docs/Web/API/CanvasRenderingContext2D/drawImage" target="_blank">CanvasRenderingContext2D: drawImage() メソッド - Web API | MDN</a>」等の記事をご参照ください。'
+                }
+            ]
+        },
+        {
+            name: 'createBufferedCanvas',
+            desc: 'バッファリングされた画像（キャンバス要素）を作成します。',
+            args: [
+                {
+                    name: 'image',
+                    type: 'object',
+                    init: 'null',
+                    desc: '初期配置する画像を指定します。指定がない（nullの）場合は空のキャンバスが作成されます。'
+                },
+                {
+                    name: 'width',
+                    type: 'int',
+                    init: '0',
+                    desc: 'キャンバスの横幅を指定します。指定がない（0以下の）場合は画像の横幅が使用されます。画像を指定しない場合は必ず1以上の値を指定する必要があります。'
+                },
+                {
+                    name: 'height',
+                    type: 'int',
+                    init: '0',
+                    desc: 'キャンバスの縦幅を指定します。指定がない（0以下の）場合は画像の縦幅が使用されます。画像を指定しない場合は必ず1以上の値を指定する必要があります。'
+                }
+            ],
+            return: {
+                type: [
+                    {
+                        name: 'width',
+                        type: 'int',
+                        desc: 'キャンバスの横幅です。'
+                    },
+                    {
+                        name: 'height',
+                        type: 'int',
+                        desc: 'キャンバスの縦幅です。'
+                    },
+                    {
+                        name: 'element',
+                        type: 'CanvasElement',
+                        desc: 'キャンバス要素です。'
+                    },
+                    {
+                        name: 'canvas',
+                        type: 'CanvasRenderingContext2D',
+                        desc: '二次元描画コンテキストです。'
+                    }
+                ],
+                desc: 'オブジェクトを返します。'
+            }
+        },
+        {
+            name: 'createChromakeydImage',
+            desc: '画像の特定の色を透過します。',
+            args: [
+                {
+                    name: 'image',
+                    type: 'object',
+                    desc: '画像データを指定します。'
+                },
+                {
+                    name: 'r',
+                    type: 'int',
+                    desc: '透過する色のRGB値のR（0〜255）を指定します。'
+                },
+                {
+                    name: 'g',
+                    type: 'int',
+                    desc: '透過する色のRGB値のG（0〜255）を指定します。'
+                },
+                {
+                    name: 'b',
+                    type: 'int',
+                    desc: '透過する色のRGB値のB（0〜255）を指定します。'
+                }
+            ],
+            return: {
+                type: 'CanvasElement',
+                desc: 'キャンバス要素（画像データ）を返します。'
+            }
+        },
+        {
+            name: 'createColoredImage',
+            desc: '画像に特定の色を合成します。',
+            args: [
+                {
+                    name: 'image',
+                    type: 'object',
+                    desc: '画像データを指定します。'
+                },
+                {
+                    name: 'color',
+                    type: 'string',
+                    desc: '合成する色を指定します。'
+                },
+                {
+                    name: 'mode',
+                    type: 'string',
+                    desc: '合成モードを指定します。詳細は「<a href="https://developer.mozilla.org/ja/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation" target="_blank">CanvasRenderingContext2D: globalCompositeOperation プロパティ - Web API | MDN</a>」等の記事をご参照ください。'
+                }
+            ],
+            return: {
+                type: 'CanvasElement',
+                desc: 'キャンバス要素（画像データ）を返します。'
+            }
+        }
+    ])
+);
+                        </script>
+                    </ul>
+
+                    <h3>scripts/control.js</h3>
+
+                    <p>キーボード操作やマルチタッチ操作を処理・管理します。</p>
+
+                    <ul>
+                        <script>
+document.currentScript.insertAdjacentHTML('afterend', createVariableDescriptionList([
+    {
+        name: 'startButton',
+        desc: 'スタートボタンに関する情報を保持します。',
+        type: [
+            {
+                name: 'isPressed',
+                type: 'boolean',
+                desc: 'ボタンが押されている場合は真、押されていない場合は偽になります。'
+            },
+            {
+                name: 'onFire',
+                type: 'boolean',
+                desc: 'ボタンが押された瞬間（フレーム）に真になります。'
+            },
+            {
+                name: 'onFireLong',
+                type: 'boolean',
+                desc: 'ボタンが押された瞬間、もしくは一定時間が経過した場合に真になります。デフォルトでは15フレーム以降に真になります。'
+            },
+            {
+                name: 'count',
+                type: 'int',
+                desc: 'ボタンが押された時間（フレーム）です。'
+            }
+        ]
+    },
+    {
+        name: 'selectButton',
+        desc: 'セレクトボタンに関する情報を保持します。',
+        type: 'object{ isPressed, onFire, onFireLong, count }'
+    },
+    {
+        name: 'actionButtonA',
+        desc: 'Aボタンに関する情報を保持します。',
+        type: 'object{ isPressed, onFire, onFireLong, count }'
+    },
+    {
+        name: 'actionButtonB',
+        desc: 'Bボタンに関する情報を保持します。',
+        type: 'object{ isPressed, onFire, onFireLong, count }'
+    },
+    {
+        name: 'dPadX',
+        desc: '十字キーのX軸方向に関する情報を保持します。右は正の値、左は負の値を取ります。',
+        type: [
+            {
+                name: 'value',
+                type: 'int',
+                desc: '十字キーが傾いている場合は1もしくは-1、傾いていない場合は0になります。'
+            },
+            {
+                name: 'pulse',
+                type: 'int',
+                desc: '十字キーが傾いた瞬間に1もしくは-1になります。'
+            },
+            {
+                name: 'pulseLong',
+                type: 'int',
+                desc: '十字キーが傾いた瞬間、もしくは一定時間が経過した場合に1もしくは-1になります。'
+            },
+            {
+                name: 'count',
+                type: 'int',
+                desc: '十字キーが押された時間です。'
+            }
+        ]
+    },
+    {
+        name: 'dPadY',
+        desc: '十字キーのY軸方向に関する情報を保持します。下は正の値、上は負の値を取ります。',
+        type: 'object{ value, pulse, pulseLong, count }'
+    }
+]));
+                        </script>
+                    </ul>
+
+                    <h3>scripts/document.js</h3>
+
+                    <p>ドキュメントの表示・非表示を切り替えます。</p>
+
+                    <h3>scripts/game.js</h3>
+
+                    <p>開発者がゲームに関するロジックを記述するためのファイルです。サンプルとしてPC-26の機能を紹介する簡易的なスクリプトが記述されています。</p>
+
+                    <ul>
+                        <script>
+document.currentScript.insertAdjacentHTML('afterend', createFunctionDescriptionList([
+    {
+        name: 'awakeGame',
+        async: true,
+        desc: 'ゲーム起動時に実行される関数です。ここで画像ファイルや音源ファイルの読み込み等を行います。'
+    },
+    {
+        name: 'startGame',
+        async: true,
+        desc: 'ゲーム開始時に実行される関数です。'
+    },
+    {
+        name: 'updateGame',
+        async: true,
+        desc: 'ゲーム開始後に繰り返し実行される関数です。',
+        args: [
+            {
+                name: 'prop',
+                desc: '更新処理に関する情報を提供します。',
+                type: [
+                    {
+                        name: 'waitingTime',
+                        type: 'int',
+                        desc: '一つ前のフレームが描画された時間（ミリ秒）です。基本的に設定されたリフレッシュレートに準じた値（デフォルトは30 Hzなので33もしくは34ミリ秒）を取りますが、ここで実行される処理が重い場合は値が大きくなる（フレームレートが低下する）可能性があります。'
+                    },
+                    {
+                        name: 'interval',
+                        type: 'int',
+                        desc: 'プロパティー「waitingTime」から関数「updateGame」等の処理に掛かった時間を減算した値です。処理が重い場合でも0未満になることはありません。'
+                    },
+                    {
+                        name: 'killCycle',
+                        type: 'boolean',
+                        desc: 'これを真に設定した場合、関数の実行が止まります。非同期の処理については別途で停止させる必要があります。'
+                    }
+                ]
+            }
+        ]
+    }
+]));
+                        </script>
+                    </ul>
+
+                    <h3>scripts/game-init.js</h3>
+
+                    <p><a href="scripts/game.js">game.js</a>の初期状態が記述されています。</p>
+
+                    <h3>scripts/system.js</h3>
+
+                    <p>ゲームを実行します。</p>
+
+                    <h3>scripts/util.js</h3>
+
+                    <p>開発者がゲームに関するユーティリティーを記述するためのファイルです。サンプルとしてプレイヤーを描画・管理するクラス等が記述されています。</p>
+
+                    <h3>sounds/</h3>
+
+                    <p>ゲームに必要な音源ファイルを格納する場所です。</p>
+
+                    <h3>styles/</h3>
+
+                    <p>PC-26に必要なCSSファイルを格納する場所です。</p>
+
+                    <h3>styles/control.css</h3>
+
+                    <p>コントローラー（ページ下部）に関するスタイルを定義します。</p>
+
+                    <h3>styles/display.css</h3>
+
+                    <p>ディスプレイ（ページ上部）に関するスタイルを定義します。</p>
+
+                    <h3>styles/document.css</h3>
+
+                    <p>説明書に関するスタイルを定義します。</p>
+
+                    <h3>styles/root.css</h3>
+
+                    <p>全体の色やサイズを定義します。</p>
+
+                    <!-- End of sample -->
+                </div>
+            </div>
+        </div>
+        <script src="scripts/document.js"></script>
+        <script src="scripts/control.js"></script>
+        <script src="scripts/canvas.js"></script>
+        <script src="scripts/audio.js"></script>
+        <script src="scripts/util.js"></script>
+        <script src="scripts/game.js"></script>
+        <script src="scripts/system.js"></script>
+    </body>
+</html>

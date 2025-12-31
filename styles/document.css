@@ -1,0 +1,100 @@
+#document-wrapper {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+#document-wrapper.hide {
+    display: none;
+}
+#document-frame {
+    position: relative;
+    width: calc(100% - var(--document-margin) * 2 - var(--document-padding) * 2);
+    max-width: var(--document-max-width);
+    height: calc(100% - var(--document-margin) * 2 - var(--document-padding) * 2);
+    margin: var(--document-margin);
+    padding: var(--document-padding);
+    border-radius: 8px;
+    color: var(--document-color);
+    background-color: var(--document-bg-color);
+    backdrop-filter: blur(3px);
+}
+#document {
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    width: 100%;
+    height: 100%;
+}
+#close-document-button {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: var(--close-doc-button-padding);
+    font-weight: bold;
+    font-size: var(--close-doc-button-print-size);
+    line-height: 1;
+    border: 0;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    color: var(--close-doc-button-color);
+    background-color: var(--close-doc-button-bg-color);
+}
+#close-document-button:active {
+    background-color: var(--close-doc-button-bg-color-action);
+}
+#document .banner {
+    width: 100%;
+    margin-top: calc(1rem + var(--close-doc-button-padding) + var(--document-padding));
+    vertical-align: bottom;
+    border-radius: 4px;
+    object-fit: cover;
+    aspect-ratio: 3 / 1;
+}
+#document h1,
+#document h2,
+#document h3,
+#document h4 {
+    margin: 2rem 0 0.5rem;
+    padding: 0;
+}
+#document p,
+#document ul,
+#document ol,
+#document table {
+    margin: 0.5rem 0;
+    padding: 0;
+}
+#document a {
+    color: var(--document-anchor-color);
+}
+#document h1 {
+    text-align: center;
+}
+#document table {
+    border-collapse: collapse;
+    border: solid 3px var(--document-color);
+}
+#document table th,
+#document table td {
+    padding: 0.25rem;
+    border: solid 1px var(--document-color);
+}
+#document ul,
+#document ol {
+    margin-left: 1rem;
+}
+#document ul > ul,
+#document ul > ol,
+#document ol > ul,
+#document ol > ol {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+#document li,
+#document li > ul,
+#document li > ol {
+    margin: 0.25rem 0;
+}
