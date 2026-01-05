@@ -1,7 +1,7 @@
 // BEGIN ADVANCED SETTINGS -----------------------------------------------------
 
 const TITLE = APP_TITLE = "PC-26: Plastic Console 26";
-const VERSION = APP_VERSION = "1.0.0";
+const VERSION = APP_VERSION = "1.0.1";
 
 const SHOW_ERROR_MESSAGE = true;
 

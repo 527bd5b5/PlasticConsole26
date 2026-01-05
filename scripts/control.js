@@ -11,6 +11,8 @@ const startButtonElement = document.getElementById('primary-button-start');
 const selectButtonElement = document.getElementById('primary-button-select');
 const dPadBodyElement = document.getElementById('d-pad-body');
 const actionButtonBodyElement = document.getElementById('action-button-body');
+const openDocumentButtonElement = document.getElementById('open-document-button');
+const closeDocumentButtonElement = document.getElementById('close-document-button');
 
 function setVolumeEvent(element, changeVolumeFunc) {
     const update = () => {
@@ -477,7 +479,12 @@ function pressedKeyEvent() {
 }
 
 document.addEventListener('keydown', (event) => {
-    if (detectKeyList.includes(event.code) && !event.repeat) {
+    if (event.code === 'KeyI') {
+        (documentWrapperElement.classList.contains('hide')
+            ? openDocumentButtonElement
+            : closeDocumentButtonElement
+        ).click();
+    } else if (detectKeyList.includes(event.code) && !event.repeat) {
         pressedKeys[event.code] = true;
 
         pressedKeyEvent();
