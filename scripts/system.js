@@ -1,9 +1,10 @@
 // BEGIN ADVANCED SETTINGS -----------------------------------------------------
 
 const TITLE = APP_TITLE = "PC-26: Plastic Console 26";
-const VERSION = APP_VERSION = "1.0.1";
+const VERSION = APP_VERSION = "1.2.0";
 
 const SHOW_ERROR_MESSAGE = true;
+const SET_MINIMUM_INTERFACE = false;
 
 const waitingTimeCycle = [33, 33, 34]; // * 10 = 1,000 millisecond => 30 Hz
 
@@ -12,6 +13,9 @@ const waitingTimeCycle = [33, 33, 34]; // * 10 = 1,000 millisecond => 30 Hz
 const rootPath = location.href.match(/^(.*[\/\\])/)[1];
 
 let waitingTimeCycleIndex = 0;
+
+if (SET_MINIMUM_INTERFACE)
+    document.getElementsByTagName('body')[0].classList.add('simple');
 
 function setSystemLabel(text, overwrite = false) {
     if (!overwrite)
