@@ -6,12 +6,18 @@
     right: var(--display-frame-width);
     gap: 8px;
 }
+body.simple .volume-control-wrapper {
+    right: 0;
+}
 .volume-control-label {
     user-select: none;
     line-height: 1;
     font-weight: bold;
     font-size: var(--volume-control-height);
     color: var(--body-color-2);
+}
+body.simple .volume-control-label {
+    color: #fff;
 }
 .volume-control {
     appearance: none;
@@ -55,6 +61,10 @@
 }
 .control-frame-2 {
     justify-content: space-between;
+}
+body.simple .control-frame-1,
+body.simple .control-frame-2 {
+    display: none;
 }
 .primary-button-wrapper {
     display: flex;

@@ -75,6 +75,9 @@ body {
     color: var(--body-text);
     background-color: var(--body-color-1);
 }
+body.simple {
+    background-color: #000;
+}
 #panel {
     margin: 16px;
 }

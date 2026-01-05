@@ -7,6 +7,12 @@
     background-color: var(--body-color-3);
     box-shadow: 0 0 4px var(--shadow-color);
 }
+body.simple #display-frame {
+    padding: var(--display-frame-height) 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+}
 #display {
     display: block;
     margin: 0;
@@ -16,6 +22,9 @@
     background-color: #000;
     aspect-ratio: 4 / 3;
     image-rendering: pixelated;
+}
+body.simple #display {
+    border: solid 1px #888;
 }
 .logo {
     user-select: none;
@@ -30,12 +39,21 @@
     background-color: var(--body-color-3);
     text-transform: uppercase;
 }
+body.simple .logo {
+    left: 0;
+    padding-right: 0;
+    color: #fff;
+    background-color: transparent;
+}
 .logo-stripe {
     position: absolute;
     top: calc((var(--display-frame-height) - var(--logo-size)) / 2 + 1px);
     left: var(--display-frame-width);
     right: var(--display-frame-width);
     height: var(--logo-size);
+}
+body.simple .logo-stripe {
+    display: none;
 }
 .logo-stripe > span {
     content: '';
