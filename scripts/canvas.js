@@ -184,7 +184,7 @@ function fillText(text, posX, posY, color = '#fff', option = null) {
     const bufferedTextList = [];
 
     let bufferedText = '';
-    let bufferedPosY = posY;
+    let bufferedPosY = 0;
 
     canvas.font = `${fontSize}px ${fontName}`;
 
